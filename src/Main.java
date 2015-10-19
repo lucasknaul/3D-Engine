@@ -6,7 +6,6 @@ public class Main {
     for(int i=0; i<50000; i++){
       engine.testRefresh();
       engine.update();
-      System.out.print("Rotate");
     }
   }
 }

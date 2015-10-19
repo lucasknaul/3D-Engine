@@ -23,11 +23,11 @@ public class Engine3D {
                                                     {100,100,150,150,100,150,100,150},
                                                     {0,0,0,0,50,50,50,50},
                                                     {1,1,1,1,1,1,1,1}});
-    DoubleMatrix t = new DoubleMatrix(new double[][]{{0,0,0,0,1,1,6,7,4,4,3,3},
+    DoubleMatrix f = new DoubleMatrix(new double[][]{{0,0,0,0,1,1,6,7,4,4,3,3},
                                                      {1,2,4,5,6,7,4,4,6,6,2,7,},
                                                      {2,3,5,3,7,2,5,5,0,1,7,5}});
-    Translation translation = new Translation(300,500,0);
-    Rotation rotation = new Rotation(Math.PI/6,0,Math.PI/6);
+    /*Translation translation = new Translation(300,500,0);
+    Rotation rotation = new Rotation(Math.PI/6,0,Math.PI/6);*/
 
     //TRANSLATION MATRIX:
     //coloca vetores na vertical e multiplica matriz de translaçao por eles
@@ -36,30 +36,32 @@ public class Engine3D {
       //o 1* valor da uultima coluna é devido ao 1 de w
 
 
-    meshes[0] = new Mesh(v, t);
-    //cameras[0] = new Camera();
+    meshes[0] = new Mesh(v, f);
+    cameras[0] = new Camera(-100,-100,0,0,Math.PI/4,0);
     //meshes[0] = new Mesh(v, t);
     //translation.mmul(meshes[0].getVertices());
   }
   public void testRefresh(){
     Rotation rotation = new Rotation(Math.PI/18000,0,Math.PI/18000);
-    meshes[0].setVertices(rotation.mmul(meshes[0].getVertices()));
+    Translation translation = new Translation(0,0,0.0);
+    meshes[0].setVertices(translation.mmul(rotation.mmul(meshes[0].getVertices())));
   }
 
   public void update(){
-    r.update(meshes);
+    r.update(cameras[0].project(meshes));
   }
 
   public Engine3D(){
     running = true;
 
     meshes = new Mesh[1];
+    cameras = new Camera[1];
     test();
 
     f = new JFrame();
     r = new Renderer(meshes);
     f.setContentPane(r);
-    f.setSize(800,600);
+    f.setSize(1600,1400);
     f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     f.setVisible(true);
   }

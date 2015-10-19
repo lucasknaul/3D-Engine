@@ -11,7 +11,7 @@ class Renderer extends JPanel {
   }
 
   public void update(Mesh[] meshes){
-    meshes = this.meshes;
+    this.meshes = meshes;
   }
 
   public void paint(Graphics g) {
