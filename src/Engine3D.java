@@ -43,7 +43,7 @@ public class Engine3D {
     //translation.mmul(meshes[0].getVertices());
 
     //TESTE DAS TRANSFORMAÇOES:
-    double tx = 0;
+  /*  double tx = 0;
     double ty = 100;
     double tz = 20;
     double rx = 0;
@@ -79,7 +79,7 @@ public class Engine3D {
     System.out.print("\nCubo em projeçao em perspectiva: <" + (int)px + " , " + (int)py + " , " + (int)pz + ">\n");
     DoubleMatrix pev = pe.mmul(pr.mmul(v));
     for(int i=0; i<v.columns; i++){ System.out.print("v" + (int)i + "<: " + (int)pev.get(0,i) + " , " + (int)pev.get(1,i) + " , " + (int)pev.get(2,i) + " , " + pev.get(3,i) + ">\n"); }
-
+*/
     //VARIAVEISDE TESTE DE ROTAÇAO DE OBJETOS
     cx=0;
     cy=0;
@@ -88,7 +88,7 @@ public class Engine3D {
   }
   public void testRefresh(){
   //cameras[0].setRotation(new DoubleMatrix(new double[][]{{cx},{cy},{cz}} ));
-  cy+=  Math.PI/1040000;
+  cy+=  Math.PI/10400;
   //cz+= cz+=
   /*  Rotation rotation = new Rotation(Math.PI/18000,0,Math.PI/18000);
     Translation translation = new Translation(0.005,0.005,0.0);
@@ -97,18 +97,38 @@ public class Engine3D {
 
   public void update(){
     Mesh[] nmeshes = new Mesh[meshes.length];
+      double tx = 0;
+      double ty = 0;
+      double tz = 300;
+      double rx = 0;;
+      double ry = 0;
+      double rz = 0;
+      double px = 0;
+      double py = 0;
+      double pz = 40;
     for(int i=0; i<meshes.length; i++){
-      Translation t = new Translation(0,100,20);
-      Rotation r = new Rotation(cx,Math.PI/48,cz);
+    DoubleMatrix v = meshes[i].getVertices();
+    DoubleMatrix f = meshes[i].getFaces();
+    //  Translation t = new Translation(0,100,20);
+    //  Rotation r = new Rotation(cx,Math.PI/48,cz);
+    /*
+          Projection pr = new Projection(-80,80,100,cx,cy,cz);
+          Perspective pe = new Perspective(0,0,30);*/
 
-      Projection pr = new Projection(-80,80,100,cx,cy,cz);
-      Perspective pe = new Perspective(0,0,30);
+      Projection pr = new Projection(tx,ty,tz,rx,cy,rz);
+      //Perspective pe = new Perspective(px,py,pz);
+      Perspective pe = new Perspective(90, 500000, 1, 10, 1000);
+      //Perspective(double fov, double depth, double aspect, double nearDist, double farDist)
       //Translation pc = new Translation(-600,-500,0);      //translaçao para colocar os objetos no centro da tela
-
       //nmeshes[i] = new Mesh( pr.mmul(meshes[i].getVertices()), meshes[i].getFaces());
       //nmeshes[i] = new Mesh(r.mmul(t.mmul(meshes[i].getVertices())), meshes[i].getFaces());
       //nmeshes[i] = new Mesh( pe.mmul(r.mmul(t.mmul((meshes[i].getVertices())))), meshes[i].getFaces());
-      nmeshes[i] = new Mesh(pe.mmul(pr.mmul(meshes[i].getVertices())), meshes[i].getFaces());      //comente essa linha para psicodelizar (e se conseguir, arrume)
+      DoubleMatrix vf =  pe.mmul(pr.mmul(v));
+      nmeshes[i] = new Mesh(vf, f);     //comente essa linha para psicodelizar (e se conseguir, arrume)
+
+      System.out.print("\nCubo em projeçao <" + (int)tx + " , " + (int)ty + " , " + (int)tz + "," + (int)rx + " , " + (int)ry + " , " + (int)rz + ">");
+      System.out.print(" em perspectiva: <" + (int)px + " , " + (int)py + " , " + (int)pz + ">\n");
+      for(int j=0; j<v.columns; j++){ System.out.print("v" + j + ": <: " + (int)vf.get(0,j) + " , " + (int)vf.get(1,j) + " , " + (int)vf.get(2,j) + " , " + (int)vf.get(3,j) + ">\n"); }
     }
     r.update(nmeshes);
   }
@@ -123,7 +143,7 @@ public class Engine3D {
     f = new JFrame();
     r = new Renderer(meshes);
     f.setContentPane(r);
-    f.setSize(1200,1000);
+    f.setSize(1200,1200);
     f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     f.setVisible(true);
   }
