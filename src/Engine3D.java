@@ -37,14 +37,54 @@ public class Engine3D {
       //cada multiiplicaçao vai fazer 1*eixo multiplicado + 1*valor da ultima coluna da matriz
       //o 1* valor da uultima coluna é devido ao 1 de w
 
-
     meshes[0] = new Mesh(v, f);
     //cameras[0] = new Camera(-200,-200,0,0,Math.PI/4,0);
     //meshes[0] = new Mesh(v, t);
     //translation.mmul(meshes[0].getVertices());
+
+    //TESTE DAS TRANSFORMAÇOES:
+    double tx = 0;
+    double ty = 100;
+    double tz = 20;
+    double rx = 0;
+    double ry = Math.PI/48;
+    double rz = 0;
+    double px = 0;
+    double py = 0;
+    double pz = 40;
+    Translation t = new Translation(tx, ty, tz);
+    Rotation r = new Rotation(rx, ry, rz);
+    Projection pr = new Projection(tx, ty, tz, rx, ry, rz);
+    Perspective pe = new Perspective(px,py,pz);
+
+    System.out.print("\nCubo original: \n");
+    for(int i=0; i<v.columns; i++){ System.out.print("v" + (int)i + "<: " + (int)v.get(0,i) + " , " + (int)v.get(1,i) + " , " + (int)v.get(2,i) + " , " + (int)v.get(3,i) + ">\n"); }
+
+    System.out.print("\nCubo translacionado: <" + (int)tx + "," + (int)ty + "," + (int)tz + ">\n");
+    DoubleMatrix tv = t.mmul(v);
+    for(int i=0; i<v.columns; i++){ System.out.print("v" + (int)i + "<: " + (int)tv.get(0,i) + " , " + (int)tv.get(1,i) + " , " + (int)tv.get(2,i) + " , " + (int)tv.get(3,i) + ">\n"); }
+
+    System.out.print("\nCubo rotacionado: <" + (int)rx + "," + (int)ry + "," + (int)rz + ">\n");
+    DoubleMatrix rv = r.mmul(v);
+    for(int i=0; i<v.columns; i++){ System.out.print("v" + (int)i + "<: " + (int)rv.get(0,i) + " , " + (int)rv.get(1,i) + " , " + (int)rv.get(2,i) + " , " + (int)rv.get(3,i) + ">\n"); }
+
+    System.out.print("\nCubo translacionado  <" + (int)tx + " , " + (int)ty + " , " + (int)tz + "> e rotacionado:  <" + (int)rx + " , " + (int)ry + " , " + (int)rz + ">\n");
+    DoubleMatrix rtv = r.mmul(t.mmul(v));
+    for(int i=0; i<v.columns; i++){ System.out.print("v" + (int)i + "<: " + (int)rtv.get(0,i) + " , " + (int)rtv.get(1,i) + " , " + (int)rtv.get(2,i) + " , " + (int)rtv.get(3,i) + ">\n"); }
+
+    System.out.print("\nCubo projetado: <" + (int)tx + " , " + (int)ty + " , " + (int)tz + (int)rx + " , " + (int)ry + " , " + (int)rz + ">\n");
+    DoubleMatrix pv = pr.mmul(v);
+    for(int i=0; i<v.columns; i++){ System.out.print("v" + (int)i + "<: " + (int)pv.get(0,i) + " , " + (int)pv.get(1,i) + " , " + (int)pv.get(2,i) + " , " + (int)pv.get(3,i) + ">\n"); }
+
+    System.out.print("\nCubo em projeçao em perspectiva: <" + (int)px + " , " + (int)py + " , " + (int)pz + ">\n");
+    DoubleMatrix pev = pe.mmul(pr.mmul(v));
+    for(int i=0; i<v.columns; i++){ System.out.print("v" + (int)i + "<: " + (int)pev.get(0,i) + " , " + (int)pev.get(1,i) + " , " + (int)pev.get(2,i) + " , " + pev.get(3,i) + ">\n"); }
+
+    //VARIAVEISDE TESTE DE ROTAÇAO DE OBJETOS
     cx=0;
     cy=0;
     cz=0;
+    cx= Math.PI/6;
   }
   public void testRefresh(){
   //cameras[0].setRotation(new DoubleMatrix(new double[][]{{cx},{cy},{cz}} ));
@@ -58,14 +98,17 @@ public class Engine3D {
   public void update(){
     Mesh[] nmeshes = new Mesh[meshes.length];
     for(int i=0; i<meshes.length; i++){
-      Projection pr = new Projection(0,0,600,cx,cy,cz);
-      Perspective pe = new Perspective(0, 0, 5);
-      //Translation t = new Translation(600,600,0);
-      //t = new Translation(20,20,0);
+      Translation t = new Translation(0,100,20);
+      Rotation r = new Rotation(cx,Math.PI/48,cz);
+
+      Projection pr = new Projection(-80,80,100,cx,cy,cz);
+      Perspective pe = new Perspective(0,0,30);
       //Translation pc = new Translation(-600,-500,0);      //translaçao para colocar os objetos no centro da tela
 
-      nmeshes[i] = new Mesh( pr.mmul(meshes[i].getVertices()), meshes[i].getFaces());
-      //nmeshes[i] = new Mesh( pe.mmul(pr.mmul(meshes[i].getVertices())), meshes[i].getFaces());      //comente essa linha para psicodelizar (e se conseguir, arrume)
+      //nmeshes[i] = new Mesh( pr.mmul(meshes[i].getVertices()), meshes[i].getFaces());
+      //nmeshes[i] = new Mesh(r.mmul(t.mmul(meshes[i].getVertices())), meshes[i].getFaces());
+      //nmeshes[i] = new Mesh( pe.mmul(r.mmul(t.mmul((meshes[i].getVertices())))), meshes[i].getFaces());
+      nmeshes[i] = new Mesh(pe.mmul(pr.mmul(meshes[i].getVertices())), meshes[i].getFaces());      //comente essa linha para psicodelizar (e se conseguir, arrume)
     }
     r.update(nmeshes);
   }
