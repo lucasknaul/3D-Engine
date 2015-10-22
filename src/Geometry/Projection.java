@@ -21,7 +21,7 @@ class Projection extends DoubleMatrix{
     double r32 = cy*sx;
     double r33 = cx*cy;
 
-    return new double[][]{{r11, r12, r13, x*r11+y*r12+z*r13},
+    return new double[][]{{r11, r12, r13, +x*r11+y*r12+z*r13},
                           {r21, r22, r23, x*r21+y*r22+z*r23},
                           {r31, r32, r33, x*r31+y*r32+z*r33},
                           {0,   0,   0,   1                }};
@@ -36,12 +36,7 @@ class Projection extends DoubleMatrix{
                {0, 1, 0, b},
                {0, 0, 1, c},
                {0, 0, 0, 1}}
-
-              {{cosy*cosz, cosx*cosz+sinx*siny*sinz, cosx*cosz*siny+sinx*sinz,  a*(cosy*cosz)+b*(cosz*sinx*siny-cosx*sinz)+c*(cosx*cosz*siny+sinx*sinz)},
-               {cosy*sinz, cosx*cosz+sinx*siny*sinz, -cosz*sinx+cosx*siny*sinz, a*(cosy*sinz)+b*(cosx*cosz+sinx*siny*sinz)+c*(-cosz*sinx+cosx*siny*sinz)},
-               {-siny,     cosy*sinx,                cosx*cosy,                 a*(-siny)+b*(cosy*sinx)+c*cosx*cosy}
-
-  */
+*/
   Projection(double x, double y, double z, double xa, double ya, double za){
     super(getProjection(x,y,z,xa,ya,za));
   }

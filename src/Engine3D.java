@@ -1,147 +1,78 @@
 import javax.swing.*;
 import java.awt.*;
 import org.jblas.DoubleMatrix;
+import java.util.ArrayList;
+import java.util.Random;
 
 public class Engine3D {
-  static int MESH_SIZE = 10;
-
-  protected boolean running;
 
   JFrame f;
-  Renderer r;
 
-  protected Mesh[] meshes;
-  //protected Camera[] cameras;
+  Geometry g;
+  Renderer r;               //Jpanel responsável por desenhar na tela
 
-  private double cx, cy, cz;
+  double debugX;
 
-  private void test(){
-    /*DoubleMatrix v = new DoubleMatrix(new double[][]{{100d,150d,150d,100d},
-                                                    {100d,100d,150d,150d},
-                                                    {0,0,0,0},
-                                                    {0,0,0,0}});*/
+  public void testInit(){   //iniciação em teste
+    //malha de vértices:
+    //          Cada coluna é um vértice
+    //          Cada linha é um eixo em coordenadas homogeneas (x,y,z,w)
+    //              (semelhante a cartesiana com o w como um escalar)
+    //     exemplo:
+    //       v[1][3] corresponde a segunda linha (eixo y) da segunda coluna (segundo vértice)
 
     DoubleMatrix v = new DoubleMatrix(new double[][]{{0,50,50,0,0,0,50,50},
                                                      {0,0,50,50,0,50,0,50},
                                                      {0,0,0,0,50,50,50,50},
                                                      {1,1,1,1,1,1,1,1}});
+    //faces:
+    //          Faces são triângulos formados por três dos vértices acima
+    //          Detalha como os vértices se conectam
+    //          Cada coluna é um triângulo
+    //          Cada linha é o endereço de um vértice na matriz de vértices
+    //      exemplo:
+    //          f[2][5] corresponde a terceira linha(3º vértice) da sexta coluna(6 face);
+    //            O número retornado seria dois, o índice do vértice 50,50,0,1
+    //            o terceiro vértice da sexta face é o vértice 50,50,0,1
+
     DoubleMatrix f = new DoubleMatrix(new double[][]{{0,0,0,0,1,1,6,7,4,4,3,3},
                                                      {1,2,4,5,6,7,4,4,6,6,2,7,},
                                                      {2,3,5,3,7,2,5,5,0,1,7,5}});
-    /*Translation translation = new Translation(300,500,0);
-    Rotation rotation = new Rotation(Math.PI/6,0,Math.PI/6);*/
+    //cria um mesh de testes usando os vetores e faces criados
+    g.addMesh(new Mesh(v, f));
 
-    //TRANSLATION MATRIX:
-    //coloca vetores na vertical e multiplica matriz de translaçao por eles
-    //matriz identidade:
-      //cada multiiplicaçao vai fazer 1*eixo multiplicado + 1*valor da ultima coluna da matriz
-      //o 1* valor da uultima coluna é devido ao 1 de w
+    //ARRUMAR ANINHAMENTO DE GEOMOBJECTS
+    //PROBLEMA: CADA GEOMoBJET SO PODE SER FILHO DE UM OUTRO
 
-    meshes[0] = new Mesh(v, f);
-    //cameras[0] = new Camera(-200,-200,0,0,Math.PI/4,0);
-    //meshes[0] = new Mesh(v, t);
-    //translation.mmul(meshes[0].getVertices());
-
-    //TESTE DAS TRANSFORMAÇOES:
-  /*  double tx = 0;
-    double ty = 100;
-    double tz = 20;
-    double rx = 0;
-    double ry = Math.PI/48;
-    double rz = 0;
-    double px = 0;
-    double py = 0;
-    double pz = 40;
-    Translation t = new Translation(tx, ty, tz);
-    Rotation r = new Rotation(rx, ry, rz);
-    Projection pr = new Projection(tx, ty, tz, rx, ry, rz);
-    Perspective pe = new Perspective(px,py,pz);
-
-    System.out.print("\nCubo original: \n");
-    for(int i=0; i<v.columns; i++){ System.out.print("v" + (int)i + "<: " + (int)v.get(0,i) + " , " + (int)v.get(1,i) + " , " + (int)v.get(2,i) + " , " + (int)v.get(3,i) + ">\n"); }
-
-    System.out.print("\nCubo translacionado: <" + (int)tx + "," + (int)ty + "," + (int)tz + ">\n");
-    DoubleMatrix tv = t.mmul(v);
-    for(int i=0; i<v.columns; i++){ System.out.print("v" + (int)i + "<: " + (int)tv.get(0,i) + " , " + (int)tv.get(1,i) + " , " + (int)tv.get(2,i) + " , " + (int)tv.get(3,i) + ">\n"); }
-
-    System.out.print("\nCubo rotacionado: <" + (int)rx + "," + (int)ry + "," + (int)rz + ">\n");
-    DoubleMatrix rv = r.mmul(v);
-    for(int i=0; i<v.columns; i++){ System.out.print("v" + (int)i + "<: " + (int)rv.get(0,i) + " , " + (int)rv.get(1,i) + " , " + (int)rv.get(2,i) + " , " + (int)rv.get(3,i) + ">\n"); }
-
-    System.out.print("\nCubo translacionado  <" + (int)tx + " , " + (int)ty + " , " + (int)tz + "> e rotacionado:  <" + (int)rx + " , " + (int)ry + " , " + (int)rz + ">\n");
-    DoubleMatrix rtv = r.mmul(t.mmul(v));
-    for(int i=0; i<v.columns; i++){ System.out.print("v" + (int)i + "<: " + (int)rtv.get(0,i) + " , " + (int)rtv.get(1,i) + " , " + (int)rtv.get(2,i) + " , " + (int)rtv.get(3,i) + ">\n"); }
-
-    System.out.print("\nCubo projetado: <" + (int)tx + " , " + (int)ty + " , " + (int)tz + (int)rx + " , " + (int)ry + " , " + (int)rz + ">\n");
-    DoubleMatrix pv = pr.mmul(v);
-    for(int i=0; i<v.columns; i++){ System.out.print("v" + (int)i + "<: " + (int)pv.get(0,i) + " , " + (int)pv.get(1,i) + " , " + (int)pv.get(2,i) + " , " + (int)pv.get(3,i) + ">\n"); }
-
-    System.out.print("\nCubo em projeçao em perspectiva: <" + (int)px + " , " + (int)py + " , " + (int)pz + ">\n");
-    DoubleMatrix pev = pe.mmul(pr.mmul(v));
-    for(int i=0; i<v.columns; i++){ System.out.print("v" + (int)i + "<: " + (int)pev.get(0,i) + " , " + (int)pev.get(1,i) + " , " + (int)pev.get(2,i) + " , " + pev.get(3,i) + ">\n"); }
-*/
-    //VARIAVEISDE TESTE DE ROTAÇAO DE OBJETOS
-    cx=0;
-    cy=0;
-    cz=0;
-    cx= Math.PI/6;
+    //mude parâmetros do random para alterar os valores dos objetos criados
+    for(int i=0; i<random(20, 10); i++){
+      g.createObject(0, random(500,-150), random(500,-150), random(500,-150), random(Math.PI*2, 0), random(Math.PI*2, 0), random(Math.PI*2, 0));
+    }
   }
-  public void testRefresh(){
-  //cameras[0].setRotation(new DoubleMatrix(new double[][]{{cx},{cy},{cz}} ));
-  cy+=  Math.PI/10400;
-  //cz+= cz+=
-  /*  Rotation rotation = new Rotation(Math.PI/18000,0,Math.PI/18000);
-    Translation translation = new Translation(0.005,0.005,0.0);
-    meshes[0].setVertices(translation.mmul(rotation.mmul(meshes[0].getVertices())));*/
+
+  private double random(double x, double a){
+      Random r = new Random();
+      return r.nextDouble()*x + a;
+  }
+
+  public void testRefresh(){    //funçao de atualizaçao teste
+    debugX+=  Math.PI/1040000;      //rotaciona o objeto pelo eixo y
   }
 
   public void update(){
-    Mesh[] nmeshes = new Mesh[meshes.length];
-      double tx = 0;
-      double ty = 0;
-      double tz = 300;
-      double rx = 0;;
-      double ry = 0;
-      double rz = 0;
-      double px = 0;
-      double py = 0;
-      double pz = 40;
-    for(int i=0; i<meshes.length; i++){
-    DoubleMatrix v = meshes[i].getVertices();
-    DoubleMatrix f = meshes[i].getFaces();
-    //  Translation t = new Translation(0,100,20);
-    //  Rotation r = new Rotation(cx,Math.PI/48,cz);
-    /*
-          Projection pr = new Projection(-80,80,100,cx,cy,cz);
-          Perspective pe = new Perspective(0,0,30);*/
+    Projection pr = new Projection(0,100,1000,0,debugX,0);          //matriz de projeção. Projeta o espaço de outro angulo e posiçao. Posição e angulo da camera. Camera girando em torno do eixo Y
+    Perspective pe = new Perspective(90, 5000000, 1, 10, 1000);     //matriz de perspectiva. manipula os vértices aumentando o eixo w a partir do z e assim escala objetos de acordo com a distancia do "tela"
 
-      Projection pr = new Projection(tx,ty,tz,rx,cy,rz);
-      //Perspective pe = new Perspective(px,py,pz);
-      Perspective pe = new Perspective(90, 500000, 1, 10, 1000);
-      //Perspective(double fov, double depth, double aspect, double nearDist, double farDist)
-      //Translation pc = new Translation(-600,-500,0);      //translaçao para colocar os objetos no centro da tela
-      //nmeshes[i] = new Mesh( pr.mmul(meshes[i].getVertices()), meshes[i].getFaces());
-      //nmeshes[i] = new Mesh(r.mmul(t.mmul(meshes[i].getVertices())), meshes[i].getFaces());
-      //nmeshes[i] = new Mesh( pe.mmul(r.mmul(t.mmul((meshes[i].getVertices())))), meshes[i].getFaces());
-      DoubleMatrix vf =  pe.mmul(pr.mmul(v));
-      nmeshes[i] = new Mesh(vf, f);     //comente essa linha para psicodelizar (e se conseguir, arrume)
-
-      System.out.print("\nCubo em projeçao <" + (int)tx + " , " + (int)ty + " , " + (int)tz + "," + (int)rx + " , " + (int)ry + " , " + (int)rz + ">");
-      System.out.print(" em perspectiva: <" + (int)px + " , " + (int)py + " , " + (int)pz + ">\n");
-      for(int j=0; j<v.columns; j++){ System.out.print("v" + j + ": <: " + (int)vf.get(0,j) + " , " + (int)vf.get(1,j) + " , " + (int)vf.get(2,j) + " , " + (int)vf.get(3,j) + ">\n"); }
-    }
-    r.update(nmeshes);
-  }
+    r.update(g.getProjection(pe.mmul(pr)));            //envia para renderer a projeçao dos objetos da geometria transformados pela matriz de perspectiva aplicada à de projeção
+  } 
 
   public Engine3D(){
-    running = true;
+    //inicialização de variáveis
+    debugX = 0;
 
-    meshes = new Mesh[1];
-    //cameras = new Camera[1];
-    test();
-
+    g = new Geometry();
     f = new JFrame();
-    r = new Renderer(meshes);
+    r = new Renderer(g.getProjection(new DoubleMatrix(new double[][]{{1,0,0,0},{0,1,0,0},{0,0,1,0},{0,0,0,1}})));
     f.setContentPane(r);
     f.setSize(1200,1200);
     f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

@@ -36,21 +36,15 @@ class Renderer extends JPanel {
         double p2x = X_OFFSET + vertices.get(0,(int)t.get(2))*p2w;
         double p2y = Y_OFFSET + vertices.get(1,(int)t.get(2))*p2w;
         double p2z = vertices.get(2,(int)t.get(2))*p2w;
-        //boolean p0p = (p0z >= 0);
-        //boolean p1p = (p1z >= 0);
-        //boolean p2p = (p2z >= 0;
-        //if (p0p && p1p)
+        boolean p0p = (p0w >= 0);
+        boolean p1p = (p1w >= 0);
+        boolean p2p = (p2w >= 0);
+      //  if (p0p && p1p)
           g.drawLine((int)p0x, (int)p0y, (int)p1x, (int)p1y);
-        //if (p1p && p2p)
+      //  if (p1p && p2p)
           g.drawLine((int)p1x, (int)p1y, (int)p2x, (int)p2y);
-        //if (p2p && p0p)
+      //  if (p2p && p0p)
           g.drawLine((int)p2x, (int)p2y, (int)p0x, (int)p0y);
-        //g.drawLine((int)p2.getX(), (int)p2.getY(), (int)p0.getX(), (int)p0.getY());
-        /*System.out.print("Desenhando triangulo " + j + " do mesh " + i + ":\n");
-        System.out.print(
-            "p0: (" + p0.getX() + "," + p0.getY() + ","+ p0.getZ() +")\n" +
-            "p1 (" + p1.getX() + "," + p1.getY() + "," + p1.getZ() + ")\n" +
-            "p2 (" + p2.getX() + "," + p2.getY() + "," + p2.getZ() + ")\n\n");*/
       }
     }
     this.repaint();
