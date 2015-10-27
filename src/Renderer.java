@@ -1,6 +1,7 @@
 import java.awt.*;
 import javax.swing.*;
 import org.jblas.DoubleMatrix;
+import java.awt.event.KeyEvent;
 
 class Renderer extends JPanel {
   static int X_OFFSET = 600;
@@ -48,5 +49,43 @@ class Renderer extends JPanel {
       }
     }
     this.repaint();
+  }
+  public void keyPressed(KeyEvent e){
+    System.out.print("caralho");
+    if(e.getKeyCode() == KeyEvent.VK_UP)
+      System.out.print("Move pra la");
+
+
+    else if(e.getKeyCode() == KeyEvent.VK_DOWN)
+     System.out.print("Move pra ca");
+
+
+    else if(e.getKeyCode() == KeyEvent.VK_LEFT)
+      System.out.print("Move para ali");
+
+
+    else if(e.getKeyCode() == KeyEvent.VK_RIGHT)
+      System.out.print("Move para a outro ali");
+
+
+    else if(e.getKeyCode() == KeyEvent.VK_W)
+      System.out.print("Move para la");
+
+
+    else if(e.getKeyCode() == KeyEvent.VK_S)
+      System.out.print("Move para ca");
+
+
+    else if(e.getKeyCode() == KeyEvent.VK_A)
+      System.out.print("Move para ali");
+
+
+    else if(e.getKeyCode() == KeyEvent.VK_D)
+      System.out.print("Move para outro ali");
+
+
+    else
+      System.out.print("Você não pressionou uma tecla 
+        de direção"); 
   }
 }
